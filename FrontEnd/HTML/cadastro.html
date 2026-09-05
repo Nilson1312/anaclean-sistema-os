@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+    <div>
+    <h1>Formulário cliente</h1>
+    <form id="Add_api" autocomplete="off">
+        <p>
+            <input placeholder="Nome" name="nome" type="text" >
+            <input placeholder="()_____-____" name="telefone" type="text" minlength="11" maxlength="11">
+            <input placeholder="Email" name="email" type="text" >
+        </p>
+            <input placeholder="Endereco" name="endereco" type="text" >
+            <input placeholder="Numero" name="numero" type="text" >
+            <input placeholder="Bairro" name="bairro" type="text" >
+            <input placeholder="Cidade" name="cidade" type="text" >
+        </p>
+        <p><input type="submit" value="Enviar"></p>
+    </form>
+
+    <h1>Deleta Cliente</h1>
+
+        <form id="Del_api" autocomplete="off">
+        <p>
+            <input placeholder="Id" type="number" name="Id">
+
+        </p>
+        <p>
+            <input type="submit" value="enviar">
+        </p>
+    </form>
+    </div>
+
+
+    <div class="tabela_estilo">
+            <ul id="registros">
+            </ul>
+    </div>
+
+     <script>
+        async function carregarClientes() {
+      const response = await fetch("http://localhost:3000/Clientes",{
+        method:'GET'
+        });
+
+      const clientes = await response.json();
+
+      const tabela = document.getElementById("registros");
+
+      tabela.innerHTML = "";
+
+      clientes.forEach(cliente => {
+        const li = document.createElement("li");
+
+        li.textContent =
+          `${cliente.id} - ${cliente.nome} - ${cliente.telefone} - ${cliente.email} - ${cliente.endereco} - ${cliente.numero} - ${cliente.bairro} - ${cliente.cidade} - ${cliente.criado_em}`;
+
+        tabela.appendChild(li);
+      });
+    }
+    carregarClientes()
+     </script>
+
+
+
+    <!-- Validação de dados FrontEnd -->
+    <script>
+        const valida = (conjunto) => {
+            
+            console.log("Script chamado!")
+            console.log(conjunto)
+
+            
+                console.log(typeof conjunto['telefone'])
+                console.log(conjunto['telefone'])
+
+            /* Testa dados que não podem ser nulos */
+            if (conjunto['nome'] == '' || ! typeof (conjunto['nome'] !== 'string')){
+                console.log(typeof conjunto['nome'])
+                console.log(conjunto['nome'])
+                return false
+            }
+
+             if (conjunto['telefone'] == '' || ! typeof (conjunto['telefone'] !== 'string')){
+                console.log(typeof conjunto['telefone'])
+                console.log(conjunto['telefone'])
+                return false
+
+            }
+
+             if (conjunto['endereco'] == '' || ! typeof (conjunto['endereco'] !== 'string')){
+                console.log(typeof conjunto['endereco'])
+                console.log(conjunto['endereco'])
+                return false
+            } 
+
+            /* Validações de tipo */
+            if (conjunto['email'] != '' && !(conjunto['email'].includes("@") && (conjunto['email'].includes(".com") || conjunto['email'].includes(".br")))){
+                console.log(typeof conjunto['endereco'])
+                console.log(conjunto['endereco'])
+                return false
+            }
+            
+            return true
+           
+        }
+
+
+    
+    </script>
+
+
+
+    <!-- Extrai dados do formulário -->
+    <script>
+        const forms_Add = document.querySelector("#Add_api")
+
+        forms_Add.addEventListener("submit", evento =>{
+            evento.preventDefault()
+            const  formdata = new FormData(forms_Add)
+            const forms_Add_Dados = Object.fromEntries(formdata)
+
+            if (valida(forms_Add_Dados) == true){
+                console.log('Dados adicionados ao banco!')
+                
+                fetch('http://localhost:3000/Clientes',{
+                    method:'POST',
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                    body: JSON.stringify(forms_Add_Dados)
+                }).then(response => {console.log(response), carregarClientes()}).catch(error => console.error('Erro ao enviar'))
+                
+                }
+                else
+                { 
+                console.log('Dados não podem ser adicionados ao banco')
+            }
+           
+        })
+
+    </script>
+
+
+    <!-- Apaga Cliente -->
+    <script>
+        const forms_Del = document.querySelector("#Del_api")
+
+        forms_Del.addEventListener("submit", evento=>{
+            evento.preventDefault()
+            const formdata = new FormData(forms_Del)
+            const forms_Del_Dados = Object.fromEntries(formdata)
+
+            fetch("http://localhost:3000/Deletacliente",{
+                method:'POST',
+                headers:{
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(forms_Del_Dados)
+            }).then(response => {console.log(response), carregarClientes()}).catch(error => console.error('Erro ao enviar'))
+            
+        })
+
+    </script>
+</body>
+</html>

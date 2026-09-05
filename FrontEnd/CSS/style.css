@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+.tabela_estilo {
+        width: 600px;
+        height: 400px;
+        overflow-y: auto;
+        overflow-x: hidden;
+}
