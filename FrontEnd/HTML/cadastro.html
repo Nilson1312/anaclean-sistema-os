@@ -7,141 +7,426 @@
     <link rel="stylesheet" href="../CSS/style.css">
 </head>
 <body>
+
+    <!--Botões para alterar os Forms-->
     <div>
-    <h1>Formulário cliente</h1>
-    <form id="Add_api" autocomplete="off">
-        <p>
-            <input placeholder="Nome" name="nome" type="text" >
-            <input placeholder="()_____-____" name="telefone" type="text" minlength="11" maxlength="11">
-            <input placeholder="Email" name="email" type="text" >
-        </p>
-            <input placeholder="Endereco" name="endereco" type="text" >
-            <input placeholder="Numero" name="numero" type="text" >
-            <input placeholder="Bairro" name="bairro" type="text" >
-            <input placeholder="Cidade" name="cidade" type="text" >
-        </p>
-        <p><input type="submit" value="Enviar"></p>
-    </form>
+        <button id="F1">Cadastrar</button>
+        <button id="F2">Atualizar</button>
+        <button id="F3">Deletar</button>
 
-    <h1>Deleta Cliente</h1>
-
-        <form id="Del_api" autocomplete="off">
-        <p>
-            <input placeholder="Id" type="number" name="Id">
-
-        </p>
-        <p>
-            <input type="submit" value="enviar">
-        </p>
-    </form>
     </div>
 
 
+    
+    <div>
+        <!-- Formulário de inserção/atualização de clientes -->
+        <form class="modoAdd" id="Add_api" autocomplete="off" style='display: none'>
+            <h1>Formulário cliente</h1>
+            <p>
+                <input placeholder="Id" name="id" class="modoAtt" type="number" style="display: none">
+                <input placeholder="Nome" name="nome" type="text" >
+
+                <input placeholder="()_____-____" id="telefoneFake" name="telefoneFake" type="text" minlength="14" maxlength="14">
+
+                <input  type="hidden" id="telefone" name="telefone" minlength="11" maxlength="11">
+
+                <input placeholder="Email" name="email" type="text" >
+            </p>
+                <input placeholder="Endereco" name="endereco" type="text" >
+                <input placeholder="Numero" name="numero" type="text" >
+                <input placeholder="Bairro" name="bairro" type="text" >
+                <input placeholder="Cidade" name="cidade" type="text" >
+            </p>
+            <p>
+                <input type="submit" value="Enviar">
+            </p>
+        </form>
+
+
+
+    
+        <!-- Formulário de exclusão de clientes -->
+        <form class="modoDel" id="Del_api" autocomplete="off" style="display: none">
+            <h1>Deleta Cliente</h1>
+            <p>
+                <input class="modoDel" placeholder="Id" type="number" name="Id">
+            </p>
+            <p>
+                <input type="submit" value="enviar">
+            </p>
+        </form>
+    </div>
+
+    
+    <div>
+        <h1>Tela de Feedback</h1>
+        <!-- Últimas ações no banco-->
+        <p class="modoAdd" style="display: none;">Último cliente adicionado: <span id="clienteAdd"></span></p>
+        <p class="modoAtt" style="display: none;">Último cliente atualizado: <span id="clienteAtt"></span></p>
+        <p class="modoDel" style="display: none;">Último cliente deletado: <span id="clienteDel"></span></p>
+
+        <!-- Feedback sobre imprevistos/erros -->
+         <p id="retorno"></p>
+    </div>
+
+
+    <!-- Posição do banco de dados-->
     <div class="tabela_estilo">
+        <h1>Registros:</h1>
+        <div style="display: none" id="erroCarregar">
+            <h1 >Erro ao carregar banco!</h1>
+            <button>Atualizar</button>
+        </div>
             <ul id="registros">
             </ul>
     </div>
 
+    
+
+
+
+
+
+
+
+
+    <!-- Carrega dados no site -->
      <script>
         async function carregarClientes() {
-      const response = await fetch("http://localhost:3000/Clientes",{
-        method:'GET'
-        });
+            try{
+                const response = await fetch("http://localhost:3000/Clientes",{ method:'GET'})
+                const clientes = await response.json()
+                const tabela = document.getElementById("registros")
 
-      const clientes = await response.json();
+                tabela.innerHTML = ""
 
-      const tabela = document.getElementById("registros");
+                clientes.forEach(cliente => {
+                    const li = document.createElement("li")
 
-      tabela.innerHTML = "";
+                    li.textContent = `${cliente.id} - ${cliente.nome} - ${cliente.telefone} - ${cliente.email} - ${cliente.endereco} - ${cliente.numero} - ${cliente.bairro} - ${cliente.cidade} - ${cliente.criado_em}`
 
-      clientes.forEach(cliente => {
-        const li = document.createElement("li");
+                    tabela.appendChild(li)        
+                }
+            
+                )   
+                } catch(error){
+                    console.log(error)
+                    document.getElementById('erroCarregar').style.display='block'
+                }
+                
+        }
 
-        li.textContent =
-          `${cliente.id} - ${cliente.nome} - ${cliente.telefone} - ${cliente.email} - ${cliente.endereco} - ${cliente.numero} - ${cliente.bairro} - ${cliente.cidade} - ${cliente.criado_em}`;
+        /* Tenta carregar novamente apertando o botão*/
+        document.getElementById('erroCarregar').addEventListener('click', () =>{
+            document.getElementById('erroCarregar').style.display='none'
+            carregarClientes()
+        })
 
-        tabela.appendChild(li);
-      });
-    }
-    carregarClientes()
+
+        /* Seleção de dados através do id*/
+        const selecao = async (id) =>{  
+            const dados = document.querySelectorAll('li')
+            const linha = Array.from(dados).find(li =>{
+                const fim = li.textContent.indexOf(" -")
+                return li.textContent.substring(0,fim) ==id
+            })
+
+            if (linha != null){
+                const resultado = linha.textContent
+                return resultado
+            } else{
+                const resultado = 'Não há dados com esse id!'
+                return resultado
+            }
+        }
      </script>
+
+
+
+    <script>
+
+        /* Mudando os forms conforme o botão pressionado */
+
+        document.getElementById('F1').addEventListener('click', () =>{
+            document.querySelectorAll('.modoAdd').forEach(elemento =>{
+                elemento.style.display="block"
+            })
+
+            document.querySelectorAll('.modoAtt').forEach(elemento =>{
+                elemento.style.display="none"
+
+            })
+            document.querySelectorAll('.modoDel').forEach(elemento =>{
+                elemento.style.display="none"
+            })
+
+            const limpaAtt = document.querySelector("input.modoAtt")
+            limpaAtt.value = ""
+            const limpaDel = document.querySelector("input.modoDel")
+            limpaDel.value = ""
+
+
+            }
+        )
+
+        document.getElementById('F2').addEventListener('click', () =>{
+            const elementos = document.querySelectorAll('.modoAdd')
+
+            elementos[0].style.display = "block"
+            elementos[1].style.display = "none"
+
+            document.querySelectorAll('.modoAtt').forEach(elemento =>{
+                elemento.style.display="block"
+            })
+
+            document.querySelectorAll('.modoDel').forEach(elemento =>{
+                elemento.style.display="none"
+            })
+
+            const limpaDel = document.querySelector("input.modoDel")
+            limpaDel.value = ""
+
+            }
+    
+        )
+
+
+        document.getElementById('F3').addEventListener('click', () =>{
+        document.querySelectorAll('.modoAdd').forEach(elemento =>{
+                elemento.style.display="none"
+            })
+
+            document.querySelectorAll('.modoAtt').forEach(elemento =>{
+                elemento.style.display="none"
+            })
+
+            document.querySelectorAll('.modoDel').forEach(elemento =>{
+                elemento.style.display="block"
+            })
+            const limpaAtt = document.querySelector("input.modoAtt")
+            limpaAtt.value = ""
+        }
+
+        )
+
+
+        /* Busca valores salvos */
+        function retoma() {
+            if (localStorage.getItem("ClienteAdd1") != null){
+                 var adicionado = localStorage.getItem("ClienteAdd1")
+            } else{
+                var adicionado = "Não foi possível recuperar o último cliente adicionado!"
+            }
+
+            if (localStorage.getItem("ClienteAtt1") != null){
+                 var atualizado = localStorage.getItem("ClienteAtt1")
+            } else{
+                var atualizado = "Não foi possível recuperar o último cliente atualizado!"
+            }
+
+            if (localStorage.getItem("ClienteDel1") != null){
+                 var deletado = localStorage.getItem("ClienteDel1")
+            } else{
+                var deletado = "Não foi possível recuperar o último cliente deletado!"
+            }
+
+
+            document.getElementById("clienteAdd").textContent = adicionado
+            document.getElementById("clienteAtt").textContent = atualizado
+            document.getElementById("clienteDel").textContent = deletado    
+        }
+
+
+
+
+
+        /* Limpando forms */
+        function limpa(forms){
+            const formulario = document.querySelector(forms)
+            formulario.reset()
+
+            const telefone = document.getElementById("telefone")
+            telefone.value = ""
+        }
+
+
+        /* Seleção de Feedback e envio*/
+
+        function Feedback(razao){
+            const retorno = document.querySelector("#retorno")
+            retorno.textContent = razao
+        }
+    </script>
+
+
 
 
 
     <!-- Validação de dados FrontEnd -->
     <script>
         const valida = (conjunto) => {
-            
-            console.log("Script chamado!")
-            console.log(conjunto)
+            /* Verifica se tem um id para atualizar*/
+            if (conjunto['id'] == ''){
 
-            
-                console.log(typeof conjunto['telefone'])
-                console.log(conjunto['telefone'])
 
-            /* Testa dados que não podem ser nulos */
-            if (conjunto['nome'] == '' || ! typeof (conjunto['nome'] !== 'string')){
-                console.log(typeof conjunto['nome'])
-                console.log(conjunto['nome'])
-                return false
+                 /* Testa dados que não podem ser nulos */
+                if (conjunto['nome'] == '' || ! typeof (conjunto['nome'] !== 'string')){
+                    console.log(typeof conjunto['nome'])
+                    console.log(conjunto['nome'])
+                    const razao = "O nome não pode ser nulo!"
+                    Feedback(razao)
+                    return false
+                }
+               
+                if ((conjunto['telefone'] == '' || ! typeof (conjunto['telefone'] !== 'string'))){
+                    console.log(typeof conjunto['telefone'])
+                    console.log(conjunto['telefone'])
+
+                    const razao = "O número de telefone não pode estar nulo!"
+                    Feedback(razao)
+                    return false
+
+                }
+
+                if (conjunto['endereco'] == '' || ! typeof (conjunto['endereco'] !== 'string')){
+                    console.log(typeof conjunto['endereco'])
+                    console.log(conjunto['endereco'])
+                    const razao = "O endereço não pode ser nulo!"
+                    Feedback(razao)
+                    return false
+                } 
+
+
+            } else{
+                let contagem = 0
+                Object.values(conjunto).forEach(valor=>{
+                    if (valor == ''){
+                        contagem += 1
+                    }
+                })
+                if (contagem == 8){
+                    const razao = "Nenhum dado foi adicionado para ser atualizado!"
+                    Feedback(razao)
+                    return false
+                }
+
             }
-
-             if (conjunto['telefone'] == '' || ! typeof (conjunto['telefone'] !== 'string')){
-                console.log(typeof conjunto['telefone'])
-                console.log(conjunto['telefone'])
-                return false
-
-            }
-
-             if (conjunto['endereco'] == '' || ! typeof (conjunto['endereco'] !== 'string')){
-                console.log(typeof conjunto['endereco'])
-                console.log(conjunto['endereco'])
-                return false
-            } 
-
+            
             /* Validações de tipo */
             if (conjunto['email'] != '' && !(conjunto['email'].includes("@") && (conjunto['email'].includes(".com") || conjunto['email'].includes(".br")))){
                 console.log(typeof conjunto['endereco'])
                 console.log(conjunto['endereco'])
+                const razao = "O e-mail não está dentro dos padrões!"
+                Feedback(razao)
                 return false
             }
-            
-            return true
-           
+
+            if (conjunto['telefone'] != '' && conjunto['telefone'].length != 11){
+                console.log(conjunto[telefone])
+                const razao = "Número de telefone não pode estar incompleto!"
+                Feedback(razao)
+                return false
+            }
+
+            return true           
         }
 
+        const telefoneFake = document.getElementById("telefoneFake")
+        const telefone = document.querySelector('#telefone')
+        
+        /* Impede o usuário digitar caracteres além de números no telefone*/
+        telefoneFake.addEventListener("beforeinput", evento =>{
+            if (evento.data && !/^\d+$/.test(evento.data)) {
+                evento.preventDefault();
+            }
+        }
+        )
 
-    
+        /* Formata o número para o usuário ao mesmo tempo que mantém o número original para o banco*/
+        telefoneFake.addEventListener('input', () => {
+            const texto = telefoneFake.value
+            var numeros = texto.replace(/[()\-\s]/g, '')
+            telefoneFake.value = formatarTelefone(numeros);
+            telefone.value = numeros;
+            })
+
+            function formatarTelefone(value) {
+
+                if (value.length == 0){
+                    return ''
+                }else if(value.length <=2){
+                    return `(${value}`
+                }else if(value.length <=7){
+                    return `(${value.slice(0,2)})${value.slice(2)}`
+                }else if(value.length <=11){
+                    return `(${value.slice(0,2)})${value.slice(2,7)}-${value.slice(7)}`
+                }}    
     </script>
 
 
 
-    <!-- Extrai dados do formulário -->
+    <!-- Extrai e envia dados do formulário -->
     <script>
         const forms_Add = document.querySelector("#Add_api")
 
+        /* Impede que o envio seja feito ao apertar enter*/
+        forms_Add.addEventListener("keydown", evento =>{
+            if  (evento.key == "Enter"){
+                event.preventDefault()
+            }
+        })
+
         forms_Add.addEventListener("submit", evento =>{
             evento.preventDefault()
+            const att = document.querySelector(".modoAtt").style.display
             const  formdata = new FormData(forms_Add)
             const forms_Add_Dados = Object.fromEntries(formdata)
 
-            if (valida(forms_Add_Dados) == true){
-                console.log('Dados adicionados ao banco!')
-                
-                fetch('http://localhost:3000/Clientes',{
+            if ((att == "block") == (forms_Add_Dados.id != '') && valida(forms_Add_Dados) == true){
+                fetch('http://localhost:3000/clientes',{
                     method:'POST',
                     headers: {
                         'Content-type': 'application/json'
                     },
                     body: JSON.stringify(forms_Add_Dados)
-                }).then(response => {console.log(response), carregarClientes()}).catch(error => console.error('Erro ao enviar'))
+                }).then(response => response.json()).then(resultado => {
+                    const id = String(resultado.id)
+                    
+                    if (resultado.modo == 'add'){
+                        carregarClientes().then(() => selecao(id)).then(dados =>{
+                            if (dados !="Não há dados com esse id!"){
+                                localStorage.setItem('ClienteAdd1',dados)
+                                const razao = "Cliente adicionado com sucesso!"
+                                rotina(razao, "#Add_api")
+                            }else{
+                                Feedback(dados)
+                            }
+                        })
+
+                    }else{
+                        carregarClientes().then(() => selecao(id)).then(dados =>{
+                            if(dados !="Não há dados com esse id!"){
+                                localStorage.setItem('ClienteAtt1',dados)
+                                const razao = "Cliente atualizado com sucesso!"
+                                rotina(razao, "#Add_api")
+
+                            }else{
+                                Feedback(dados)
+                            }
+                            })
+                    }
+                    
+                      
+                
+                }).catch(error => {console.error('Erro ao enviar')
+                console.log(error)})
                 
                 }
                 else
-                { 
-                console.log('Dados não podem ser adicionados ao banco')
+                {
+                const razao = "Dados não podem ser adicionados ao banco!"
+                Feedback(razao)
             }
-           
         })
 
     </script>
@@ -151,21 +436,66 @@
     <script>
         const forms_Del = document.querySelector("#Del_api")
 
+         /* Impede que o envio seja feito ao apertar enter*/
+        forms_Del.addEventListener("keydown", evento =>{
+            if  (evento.key == "Enter"){
+                event.preventDefault()
+            }
+        
+        })
+        
+
         forms_Del.addEventListener("submit", evento=>{
             evento.preventDefault()
             const formdata = new FormData(forms_Del)
             const forms_Del_Dados = Object.fromEntries(formdata)
-
+            
+            /* Verifica e busca os dados conforme id fornecido */
+            selecao(forms_Del_Dados["Id"]).then(dados =>{
+                if (dados != "Não há dados com esse id!"){
+                var escolha ='Dados selecionados:  ' + dados + '    excluir esses dados?'
+                }else{
+                    Feedback(dados)
+                    return
+                }
+                 
+            /* Ativa uma notificação para confirmar a exclusão dos dados*/
+            const resposta = confirm(escolha)
+            if (resposta == true){
             fetch("http://localhost:3000/Deletacliente",{
                 method:'POST',
                 headers:{
                     'Content-type': 'application/json'
                 },
                 body: JSON.stringify(forms_Del_Dados)
-            }).then(response => {console.log(response), carregarClientes()}).catch(error => console.error('Erro ao enviar'))
-            
-        })
 
+            }).then(response => {
+                localStorage.setItem('ClienteDel1',dados)
+                const razao = "Cliente deletado com sucesso!"
+                rotina(razao,"#Del_api")
+            }).catch(error => console.error('Erro ao enviar'))
+
+            }
+            })
+                    
+        })
+    </script>
+
+   
+
+    
+    <!-- Scripts carregados ao entrar no site-->
+    <script>
+        carregarClientes()
+        retoma()
+        Feedback()
+
+        function rotina(retorno, limpeza){
+            carregarClientes()
+            retoma()
+            Feedback(retorno)
+            limpa(limpeza)
+        }
     </script>
 </body>
 </html>

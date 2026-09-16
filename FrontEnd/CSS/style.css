@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-.tabela_estilo {
+#registros {
         width: 600px;
         height: 400px;
         overflow-y: auto;

@@ -28,20 +28,51 @@ app.get('/clientes', async (req, res) => {
 // Cadastrar novo cliente
 app.post('/clientes', async (req, res) => {
   console.log(req.body)
-  const { nome, telefone, email, endereco, numero, bairro, cidade } = req.body;
-  console.log(nome)
+
+
+  if (req.body.id==''){
+    const { nome, telefone, email, endereco, numero, bairro, cidade } = req.body;    
+    try {
+      const db = await getDatabaseConnection();
+      const resultado = await db.run(
+        `INSERT INTO clientes (nome, telefone, email, endereco, numero, bairro, cidade) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [nome, telefone, email, endereco, numero, bairro, cidade || 'São Paulo']
+      );
+      res.status(201).json({ id: resultado.lastID, modo:'add', mensagem: 'Cliente salvo com sucesso!' });
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ erro: error.message });
+    }
   
-  try {
-    const db = await getDatabaseConnection();
-    const resultado = await db.run(
-      `INSERT INTO clientes (nome, telefone, email, endereco, numero, bairro, cidade) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [nome, telefone, email, endereco, numero, bairro, cidade || 'São Paulo']
-    );
-    res.status(201).json({ id: resultado.lastID, mensagem: 'Cliente salvo com sucesso!' });
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ erro: error.message });
+  }else{
+
+    console.log(req.body)
+    const { id, nome, telefone, email, endereco, numero, bairro, cidade } = req.body
+    const camposselecionados = ['nome','telefone','email','endereco','numero','bairro','cidade']
+    
+     try {
+      const campos = Object.keys(req.body).filter(campo => camposselecionados.includes(campo) && req.body[campo] !== '') 
+      const valores = campos.map(campo => req.body[campo])
+
+      const set = campos
+      .map(campo => `${campo} = ?`)
+      .join(', ')
+
+ 
+      const db = await getDatabaseConnection();
+      await db.run(
+          `UPDATE clientes
+          SET ${set}
+          WHERE id = ?`,[...valores, id]
+      )
+      res.status(201).json({ id: id, modo:'att', mensagem: 'Cliente atualizado com sucesso!' });
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ erro: error.message });
+    }
+
   }
 });
 
@@ -53,9 +84,10 @@ app.post('/Deletacliente', async(req, res) =>{
   try{
     const db = await getDatabaseConnection()
     await db.run('DELETE FROM clientes WHERE id = ?',[id])
+    res.status(201).json({ id: resultado.lastID, mensagem: 'Cliente deletado com sucesso!' })
   }
   catch(error){
-    res.status(500).json({ erro: error.message });
+    res.status(500).json({ erro: error.message })
   }
    
 })
