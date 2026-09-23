@@ -8,89 +8,46 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
+const {carregaClientes, cadastraCliente, atualizaCliente, deletaCliente} = require("../scripts/clientes.js")
+
+
+
 // Rota de teste
 app.get('/', (req, res) => {
   res.json({ status: 'API AnaClean ativa e conectada ao banco!' });
 });
 
+
+// Página Clinte
 // Listar clientes cadastrados
 app.get('/clientes', async (req, res) => {
-  try {
-    const db = await getDatabaseConnection();
-    const clientes = await db.all('SELECT * FROM clientes ORDER BY Id DESC');
-    res.json(clientes);
-    console.log('Dados enviados para a tabela no site!')
-  } catch (error) {
-    res.status(500).json({ erro: error.message });
-  }
+  const resposta = await carregaClientes()
+ 
+  res.json(resposta)
 });
 
 // Cadastrar novo cliente
 app.post('/clientes', async (req, res) => {
-  console.log(req.body)
-
-
-  if (req.body.id==''){
-    const { nome, telefone, email, endereco, numero, bairro, cidade } = req.body;    
-    try {
-      const db = await getDatabaseConnection();
-      const resultado = await db.run(
-        `INSERT INTO clientes (nome, telefone, email, endereco, numero, bairro, cidade) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [nome, telefone, email, endereco, numero, bairro, cidade || 'São Paulo']
-      );
-      res.status(201).json({ id: resultado.lastID, modo:'add', mensagem: 'Cliente salvo com sucesso!' });
-    } catch (error) {
-      console.log(error)
-      res.status(500).json({ erro: error.message });
-    }
-  
+  if (req.body.Id==''){
+    const resposta = await cadastraCliente(req)
+    console.log(resposta)
+    res.json(resposta)
   }else{
-
-    console.log(req.body)
-    const { id, nome, telefone, email, endereco, numero, bairro, cidade } = req.body
-    const camposselecionados = ['nome','telefone','email','endereco','numero','bairro','cidade']
-    
-     try {
-      const campos = Object.keys(req.body).filter(campo => camposselecionados.includes(campo) && req.body[campo] !== '') 
-      const valores = campos.map(campo => req.body[campo])
-
-      const set = campos
-      .map(campo => `${campo} = ?`)
-      .join(', ')
-
- 
-      const db = await getDatabaseConnection();
-      await db.run(
-          `UPDATE clientes
-          SET ${set}
-          WHERE id = ?`,[...valores, id]
-      )
-      res.status(201).json({ id: id, modo:'att', mensagem: 'Cliente atualizado com sucesso!' });
-
-    } catch (error) {
-      console.log(error)
-      res.status(500).json({ erro: error.message });
-    }
-
+      const resposta = await atualizaCliente(req.body)
+      console.log(resposta)
+      res.json(resposta)
   }
 });
 
 
 ///DELETA CLIENTE CONFORME ID
 app.post('/Deletacliente', async(req, res) =>{
-  console.log("Chamada Del feita!")
-  const id = req.body.Id
-  try{
-    const db = await getDatabaseConnection()
-    await db.run('DELETE FROM clientes WHERE id = ?',[id])
-    res.status(201).json({ id: resultado.lastID, mensagem: 'Cliente deletado com sucesso!' })
-  }
-  catch(error){
-    res.status(500).json({ erro: error.message })
-  }
-   
+  const resposta = await deletaCliente(req.body.Id)
+  res.json(resposta)   
 })
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);

@@ -23,7 +23,7 @@
         <form class="modoAdd" id="Add_api" autocomplete="off" style='display: none'>
             <h1>Formulário cliente</h1>
             <p>
-                <input placeholder="Id" name="id" class="modoAtt" type="number" style="display: none">
+                <input placeholder="Id" name="Id" class="modoAtt" type="number" style="display: none">
                 <input placeholder="Nome" name="nome" type="text" >
 
                 <input placeholder="()_____-____" id="telefoneFake" name="telefoneFake" type="text" minlength="14" maxlength="14">
@@ -97,9 +97,13 @@
                 const response = await fetch("http://localhost:3000/Clientes",{ method:'GET'})
                 const clientes = await response.json()
                 const tabela = document.getElementById("registros")
-
+                if (clientes.length == 0){
+                    const razao = "Não há dados no banco!"
+                    Feedback(razao)
+                    return false
+                }
+                
                 tabela.innerHTML = ""
-
                 clientes.forEach(cliente => {
                     const li = document.createElement("li")
 
@@ -266,7 +270,7 @@
     <script>
         const valida = (conjunto) => {
             /* Verifica se tem um id para atualizar*/
-            if (conjunto['id'] == ''){
+            if (conjunto['Id'] == ''){
 
 
                  /* Testa dados que não podem ser nulos */
@@ -382,51 +386,39 @@
             const  formdata = new FormData(forms_Add)
             const forms_Add_Dados = Object.fromEntries(formdata)
 
-            if ((att == "block") == (forms_Add_Dados.id != '') && valida(forms_Add_Dados) == true){
+            if ((att == "block") == (forms_Add_Dados.Id != '') && valida(forms_Add_Dados) == true){
                 fetch('http://localhost:3000/clientes',{
                     method:'POST',
                     headers: {
                         'Content-type': 'application/json'
                     },
                     body: JSON.stringify(forms_Add_Dados)
-                }).then(response => response.json()).then(resultado => {
-                    const id = String(resultado.id)
-                    
-                    if (resultado.modo == 'add'){
-                        carregarClientes().then(() => selecao(id)).then(dados =>{
-                            if (dados !="Não há dados com esse id!"){
-                                localStorage.setItem('ClienteAdd1',dados)
-                                const razao = "Cliente adicionado com sucesso!"
-                                rotina(razao, "#Add_api")
-                            }else{
-                                Feedback(dados)
-                            }
-                        })
+                }).then(response => response.json()).then(async resultado => {
+                    console.log(forms_Add_Dados.Id)
+                    await carregarClientes()
+                    const dados = await selecao(resultado.Id)
+
+                    if (dados !="Não há dados com esse id!"){
+                        if (forms_Add_Dados.Id == ''){
+                            localStorage.setItem("ClienteAdd1", dados)
+                            const razao = "Cliente adicionado com sucesso!"
+                            rotina(razao, "#Add_api")
+                        }else{
+                            localStorage.setItem('ClienteAtt1',dados)
+                            const razao = "Cliente atualizado com sucesso!"
+                            rotina(razao, "#Add_api")
+
+
+                        }    
 
                     }else{
-                        carregarClientes().then(() => selecao(id)).then(dados =>{
-                            if(dados !="Não há dados com esse id!"){
-                                localStorage.setItem('ClienteAtt1',dados)
-                                const razao = "Cliente atualizado com sucesso!"
-                                rotina(razao, "#Add_api")
-
-                            }else{
-                                Feedback(dados)
-                            }
-                            })
+                        Feedback(dados)
                     }
-                    
-                      
-                
+
                 }).catch(error => {console.error('Erro ao enviar')
                 console.log(error)})
                 
                 }
-                else
-                {
-                const razao = "Dados não podem ser adicionados ao banco!"
-                Feedback(razao)
-            }
         })
 
     </script>
