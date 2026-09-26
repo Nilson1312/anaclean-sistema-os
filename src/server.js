@@ -8,7 +8,22 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-const {carregaClientes, cadastraCliente, atualizaCliente, deletaCliente} = require("../scripts/clientes.js")
+const {carregaClientes, cadastraCliente, atualizaCliente, deletaCliente, buscaClienteId, buscaClienteCampo} = require("../scripts/clientes.js")
+
+
+
+
+
+
+
+
+// Página de teste
+// Derruba banco de dados Clientes
+app.get("/ClientesDerruba", async ()=>{
+  const db = await getDatabaseConnection();
+    const resultado = await db.run("DROP TABLE clientes"
+  )
+})
 
 
 
@@ -44,6 +59,18 @@ app.post('/clientes', async (req, res) => {
 app.post('/Deletacliente', async(req, res) =>{
   const resposta = await deletaCliente(req.body.Id)
   res.json(resposta)   
+})
+
+/// Busca clientes através de dados parciais
+app.post("/BuscaCliente", async(req,res)=>{
+  if (req.body.Id != ""){
+    const resposta = await buscaClienteId(req.body.Id)
+    res.json(resposta)
+  }else{
+    const resposta = await buscaClienteCampo(req.body)
+    res.json(resposta)
+  }
+  
 })
 
 

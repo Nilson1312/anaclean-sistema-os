@@ -7,12 +7,19 @@
     <link rel="stylesheet" href="../CSS/style.css">
 </head>
 <body>
+    <a href="index.html">
+        <button>
+            Index
+        </button>
+    </a>
+   
 
     <!--Botões para alterar os Forms-->
     <div>
         <button id="F1">Cadastrar</button>
         <button id="F2">Atualizar</button>
         <button id="F3">Deletar</button>
+        <button id="F4">Buscar</button>
 
     </div>
 
@@ -67,6 +74,7 @@
 
         <!-- Feedback sobre imprevistos/erros -->
          <p id="retorno"></p>
+         <div id ="feedbackBusca"></div>
     </div>
 
 
@@ -82,10 +90,6 @@
     </div>
 
     
-
-
-
-
 
 
 
@@ -212,6 +216,17 @@
         }
 
         )
+
+        const busca = document.getElementById("F4")
+        busca.addEventListener("click", ()=>{
+            if (busca.style.backgroundColor != "green"){
+                busca.style.backgroundColor = "green"
+            }else{
+                busca.style.backgroundColor = "white"
+                document.getElementById("feedbackBusca").innerHTML=""
+            }
+            
+        })
 
 
         /* Busca valores salvos */
@@ -380,6 +395,54 @@
             }
         })
 
+        /* Se os sistema de busca estiver ativo trará automaticamente os dados ao digitar no forms de cadastro/atualiza */
+        forms_Add.addEventListener("keyup", letra =>{
+        if (busca.style.backgroundColor == "green"){
+            const filtro = new FormData(forms_Add)
+            const dados = Object.fromEntries(filtro)
+            if (dados.Id != "" || Object.values(dados).some(valor => valor.length >= 1)){
+                dados.telefoneFake = ""
+                fetch("http://localhost:3000/BuscaCliente",{
+                    method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)}
+                ).then(async response =>{
+                    const clientes = await response.json()
+                    retorno(clientes)
+                    })
+                }else{
+                    const feedback = document.getElementById("feedbackBusca")
+                    feedback.innerHTML =""
+
+                }
+        }
+        })
+
+        /* faz a construção da div que contém os dados buscados*/
+        function retorno(dados){
+        const lista = document.createElement("div")
+        lista.style.backgroundColor = "black"
+        lista.style.maxHeight = "200px"
+        lista.style.overflowY = "auto"
+        lista.style.overflowX = "hidden"
+
+        dados.forEach(cliente =>{
+            const linha = document.createElement("p")
+            linha.style.color="green"
+    
+            linha.textContent = `${cliente.id} - ${cliente.nome} - ${cliente.telefone} - ${cliente.email} - ${cliente.endereco} - ${cliente.numero} - ${cliente.bairro} - ${cliente.cidade} - ${cliente.criado_em}`
+            lista.append(linha)
+
+        })
+        const feedback = document.getElementById("feedbackBusca")
+        feedback.innerHTML = (lista.outerHTML)
+        }
+
+
+
+        /* Ao apertar o botão ativa o script de cadastro */
         forms_Add.addEventListener("submit", evento =>{
             evento.preventDefault()
             const att = document.querySelector(".modoAtt").style.display
@@ -394,7 +457,6 @@
                     },
                     body: JSON.stringify(forms_Add_Dados)
                 }).then(response => response.json()).then(async resultado => {
-                    console.log(forms_Add_Dados.Id)
                     await carregarClientes()
                     const dados = await selecao(resultado.Id)
 
@@ -435,8 +497,31 @@
             }
         
         })
-        
 
+        forms_Del.addEventListener("keyup", letra =>{
+        if (busca.style.backgroundColor == "green"){
+            const filtro = new FormData(forms_Del)
+            const dados = Object.fromEntries(filtro)
+            if (dados.Id != ""){
+                fetch("http://localhost:3000/BuscaCliente",{
+                    method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)}
+                ).then(async response =>{
+                    const clientes = await response.json()
+                    retorno(clientes)
+                    })
+                }else{
+                    const feedback = document.getElementById("feedbackBusca")
+                    feedback.innerHTML =""
+
+                }
+        }
+        })
+        
+        /* Ao apertar o botão faz com que o cliente seja deletado*/
         forms_Del.addEventListener("submit", evento=>{
             evento.preventDefault()
             const formdata = new FormData(forms_Del)

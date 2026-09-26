@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancos</title>
+</head>
+<body>
+    <div id="cliente">
+        <button onclick="dropaClientes()">Derrubar banco clientes</button>
+        <button onclick="AdicionaCliente()">Adicionar ClienteFantasma</button>
+    </div>
+
+    <script>
+        function dropaClientes(){
+            fetch("http://localhost:3000/ClientesDerruba",{ method:'GET'}).response(()=>{
+            })
+        }
+
+
+
+
+
+       
+
+        function AdicionaCliente(){
+        const nomes = ["jose",
+            "francisco",
+            "ana",
+            "julia"	,
+            "juliana"	,
+            "fernanda",	
+            "paulo",
+            "patricia",	
+            "gabriel", 
+            "maria", 
+            "joao",
+            "antonio",
+            "francisca",
+            "pedro",
+            "antonia",
+            "carlos",
+            "lucas",
+            "adriana",
+            "luiz",
+            "marcia"	
+
+        ]
+        const enderecos = ["RUA DOIS",
+            "RUA TRÊS",
+            "RUA UM",
+            "RUA B",
+            "RUA QUATRO",
+            "RUA PRINCIPAL",
+            "RUA A",
+            "RUA C",
+            "RUA CINCO",
+            "RUA SEIS",
+            "RUA D",
+            "RUA SETE",
+            "RUA OITO",
+            "RUA E",
+            "RUA F",
+            "RUA NOVE",
+            "RUA DEZ",
+            "RUA G",
+            "RUA SAO JOSE",
+            "RUA ONZE"]    
+        const bairros = ["Consolação",
+            "Vila Olímpia",
+            "Bela Vista",
+            "Paraíso",
+            "Vila Mariana",
+            "Pinheiros",
+            "Perdizes",
+            "Vila Nova Conceição",
+            "Pompeia",
+            "Moema",
+            "Jardim Paulista",
+            "Alto de Pinheiros",
+            "Itaim Bibi",
+            "Santo Amaro",
+            "Saúde",
+            "Lapa",
+            "Morumbi",
+            "Tatuapé",
+            "Vila Madalena",
+            "Higienópolis"]
+      
+        const nome = nomes[Math.floor(Math.random() * (20-1))+1]
+        const endereco = enderecos[Math.floor(Math.random() * (20-1))+1]
+        const bairro = bairros[Math.floor(Math.random() * (20-1))+1]
+        const numerotel = String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1) + String(Math.floor(Math.random() * (9-1))+1)
+        const numero = Math.floor(Math.random() * (800-50))+1
+        const email = nome+"@gmail.com"
+
+        const dados = {
+            Id:"",
+            nome:nome,
+            telefone:numerotel,
+            email:email,
+            endereco:endereco,
+            numero:numero,
+            bairro:bairro
+        }
+        fetch('http://localhost:3000/clientes',{
+            method:'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(dados)
+        }).then(response =>{
+            console.log(response)
+
+    
+            
+        })
+    }
+        
+    </script>
+</body>
+</html>
