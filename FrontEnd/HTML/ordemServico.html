@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordem de Serviço</title>
+    <link rel="stylesheet" href="../CSS/Ordemstyle.css">
+</head>
+<body>
+    <nav id="menu">
+        <div class="item">
+            <button onclick="menuBotao('Cliente')">Pesquisa Cliente</button>
+            <div id="Cliente">
+                <label>
+                    <input type="checkbox" name="Id">Id
+                </label>
+                <label>
+                    <input type="checkbox" name="nome">Nome
+                </label>
+                <label>
+                <input type="checkbox" name="telefone">Telefone
+                    </label>
+                <label>
+                    <input type="checkbox" name="email">Email
+                </label>
+                <label>
+                <input type="checkbox" name="endereco">Endereço
+                </label>
+                <label>
+                    <input type="checkbox" name="numero">Número
+                </label>
+                <label>
+                    <input type="checkbox" name="bairro">Bairro
+                </label>
+                <label>
+                    <input type="checkbox" name="cidade">Cidade
+                </label>
+            </div>
+        </div>
+    
+        <div class="item">
+            <button onclick="menuBotao('Servico')">Pesquisa Serviço</button>
+            <div id="Servico">
+                <label>
+                    <input type="checkbox" name="Id">Id
+                </label>
+                <label>
+                    <input type="checkbox" name="titulo">Título
+                </label>
+                <label>
+                    <input type="checkbox" name="descricao">Descrição
+                </label>
+                <label>
+                    <input type="checkbox" name="valor_base">Valor
+                </label>
+            </div>
+        </div>
+
+        <div class="item">
+            <button onclick="menuBotao('Ordem')">Pesquisa Ordem</button>
+            <div id="Ordem">
+                <label>
+                    <input type="checkbox" name="Id">IdOrdem
+                </label>
+                <label>
+                    <input type="checkbox" name="cliente_id">IdCliente
+                </label>
+                <label>
+                    <input type="checkbox" name="status">Status
+                </label>
+                <label>
+                    <input type="checkbox" name="data_agendamento">Data Agendamento
+                </label>
+                <label>
+                    <input type="checkbox" name="data_conclusao">Data Conclusão
+                </label>
+                <label>
+                    <input type="checkbox" name="valor_total">Valor Total
+                </label>
+                <label>
+                    <input type="checkbox" name="forma_pagamento">Forma de Pagamento
+                </label>
+                <label>
+                    <input type="checkbox" name="observacoes">Observações
+                </label>
+            </div>
+        </div>
+
+        <button onclick="Ordem('IdOrdemCriar')">Criar Ordem</button>
+        <button onclick="Ordem('IdOrdemFinalizar')">Finalizar Ordem</button>
+        <button onclick="servicoAdicionar()" id="servicoBotao">Adicionar Serviço</button>
+    </nav>    
+    
+    <div id="formularios">
+        <form id="IdCliente";>
+            <p>
+                <input placeholder="Id" name="Id" type="number" >
+                <input placeholder="Nome" name="nome" type="text" >
+                <input placeholder="()_____-____" id="telefone" name="telefone" type="text" minlength="11" maxlength="11">
+
+                <input placeholder="Email" name="email" type="text" >
+            </p>
+                <input placeholder="Endereco" name="endereco" type="text" >
+                <input placeholder="Numero" name="numero" type="text" >
+                <input placeholder="Bairro" name="bairro" type="text" >
+                <input placeholder="Cidade" name="cidade" type="text" >
+            
+        </form>
+        <form id="IdServico">
+            <input placeholder="Id" name="Id" type="number" >
+            <input placeholder="Título" name="titulo" type="text">
+            <input placeholder="descrição" name="descricao" type="text">
+            <input placeholder="Valor" name="valor_base" type="text">
+
+        </form>
+        <form id="IdOrdem">
+            <input type="text" placeholder="Id Ordem" name="Id">
+            <input type="text" placeholder="Id Cliente" name="cliente_id">
+            <input type="text" placeholder="Status" name="status">
+            <input type="date" placeholder="Data de Agendamento" name="data_agendamento">
+            <input type="date" placeholder="Data de Conclusão" name="data_conclusao">
+            <input type="text" placeholder="Valor Total" name="valor_total">
+            <input type="text" placeholder="Forma de Pagamento" name="forma_pagamento">
+            <input type="text" placeholder="Observações" name="observacoes">
+        </form>
+
+        <div id="feedback">
+            <div id="Clientes"></div>
+            <div id="Servicos"></div>
+            <div id="Ordens"></div>
+            <div id="Itens"></div>
+        </div>
+        
+    </div>
+
+
+    <div id="OrdemForms">
+
+        <form id="IdOrdemCriar">
+            <input type="text" placeholder="IdCliente" name="cliente_id">
+            <input type="date" placeholder="Data de Agendamento" name="data_agendamento">
+            <input type="text" placeholder="Valor Total" name="valor_total">
+            <input type="text" placeholder="Forma de Pagamento" name="forma_pagamento">
+            <input type="text" placeholder="Observações" name="observacoes">
+            <input type="submit" value="Criar">
+        </form>
+
+        <form id="IdOrdemFinalizar">
+            <input type="number" placeholder="Id Ordem" name="Id">
+            <input type="date" placeholder="Data de Conclusão" name="data_conclusao">
+            <input type="submit" value="Finalizar">
+        </form>
+
+        <div id="FeedbackDados">
+
+        </div>
+        
+    </div>
+
+    <div id="servicosEmOrdem">
+        <form id="IdServicoAdicionar">
+            <input type="text" placeholder="Id da Ordem" name="ordem_servico_id">
+            <input type="text" placeholder="Id do Serviço" name="servico_id">
+            <input type="text" placeholder="Quantidade" name="quantidade">
+            <input type="text" placeholder="Preço unitário" name="preco_unitario">
+            <input type="submit" value="Adicionar">
+        </form>
+        <div id="FeedbackItens"></div>
+    </div>
+    
+     
+    
+    
+    
+
+    <script>
+        /*Evita que enter envie os formulários*/
+        const Formularios = document.querySelectorAll("form")
+        Formularios.forEach(form =>{
+            form.addEventListener("keypress", tecla=>{
+                if (tecla.key == "Enter"){
+                    tecla.preventDefault()
+                }
+            })
+        })
+
+
+
+        const servicoForms = document.getElementById("IdServicoAdicionar")
+        /* Função que mostra o forms de itens de serviço e as ordens que não possuem itens*/
+        async function servicoAdicionar(){   
+            const servicoDiv = document.getElementById("FeedbackItens")
+            if (getComputedStyle(servicoForms).display == "none"){
+                servicoForms.style.display= "block"
+                servicoDiv.style.display = "block"
+                const resposta = await fetch("http://localhost:3000/buscaItem", {method:"GET"})
+                const resultado = await resposta.json()
+                retorno(resultado, "Itens")
+            }else{
+                servicoForms.style.display= "none"
+                servicoDiv.style.display = "none"
+                document.getElementById("Itens").innerHTML=""
+                limpaForms("#IdServicoAdicionar")
+            }
+            
+
+        }
+        /* Dispara quando usuário enviar os dados do forms dos itens*/
+        servicoForms.addEventListener("submit", async evento=>{
+            evento.preventDefault()
+            const  formdata = new FormData(evento.target)
+            const dados = Object.fromEntries(formdata)
+
+            const resultado = await ValidaDados(dados)
+            if (resultado == true){
+                    const envio = await fetch("http://localhost:3000/cadastraItem", {method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)})
+                    const resposta = await envio.json()
+                    if (envio.status == 201){
+                        const razao = "Itens foram adicionados à ordem"
+                        feedback(razao, "FeedbackItens")
+                        verificaOrdem()
+                    }else if(envio.status == 409){
+                        const razao = "Dados não podem ser adicionados, conflito de chaves!"
+                        feedback(razao, "FeedbackItens")
+                    }
+            }
+        })
+
+
+        /* Verifica se alguma ordem não possui itens*/
+        async function verificaOrdem(){
+            const resposta = await fetch("http://localhost:3000/buscaItem", {method:"GET"})
+            const resultado = await resposta.json()
+            if (Object.keys(resultado).length != 0){
+                const servicoBotao = document.getElementById("servicoBotao")
+                servicoBotao.style.backgroundColor= "yellow"
+            }
+        }
+
+    </script>
+
+    
+
+
+    <script>
+        /*Revela/esconde os formularios de ordem*/
+        function Ordem(form){
+            const IdOrdem = document.getElementById(form)
+            if (getComputedStyle(IdOrdem).display =="none"){
+                IdOrdem.style.display ="block"
+            }else{
+                IdOrdem.style.display = "none"
+                limpaForms("#" + form)
+            }
+        }
+
+        /* Verifica os forms de Ordem, traz os dados deles e envia ao clicar no botão*/
+        document.getElementById("OrdemForms").querySelectorAll("form").forEach(form =>{
+            form.addEventListener("submit", async evento=>{
+                evento.preventDefault()
+                const  formdata = new FormData(evento.target)
+                const dados_ordem = Object.fromEntries(formdata)
+                if (await ValidaDados(dados_ordem) == true){
+                    const resultado = await fetch("http://localhost:3000/ordens",{
+                        method:'POST',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dados_ordem)})
+                    verificaOrdem()
+                    limpaForms("#" + evento.target.id)
+                }     
+            })
+        })
+
+
+
+        /*Validação de dados dos formularios, cada um tem suas próprias especificações que são filtradas a partir da quantidade de campos*/
+        async function ValidaDados(dados){
+            if (Object.keys(dados).length == 5){
+                if (dados.cliente_id == ""){
+                    const razao = "Id do Cliente não pode ser nulo!"
+                    feedback(razao,"FeedbackDados")
+                    return false
+                }else{
+                    const id = {Id:dados.cliente_id}
+                    const response = await fetch("http://localhost:3000/BuscaCliente",{
+                        method:'POST',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(id)})
+                    const cliente = await response.json()
+                    if (cliente.length >= 1){
+                        if (cliente[0].id != id.Id){
+                            const razao = "Cliente não encontrado!"
+                            feedback(razao,"FeedbackDados")
+                            return false
+                        }
+                    }else{
+                        const razao = "Cliente não encontrado!"
+                        feedback(razao,"FeedbackDados")
+                        return false
+                    }
+                }
+            
+                if(dados.data_agendamento == ""){
+                    const razao = "Data de agendamento não foi selecionada!"
+                    feedback(razao,"FeedbackDados")
+                    return false
+                }
+
+            }else if(Object.keys(dados).length == 4){
+                const valido = Object.values(dados).some(campo => campo == "")
+                if (valido){
+                    feedback("Há dados não preenchidos!","FeedbackDados")
+                    return false
+                }
+
+            }else if(Object.keys(dados).length == 2){
+                const id = {Id:dados.Id}
+                const response = await fetch("http://localhost:3000/BuscaOrdem",{
+                    method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(id)})
+                const ordem = await response.json()
+                if (ordem.length >= 1){
+                    if (ordem[0].id != id.Id){
+                        const razao = "Ordem não encontrada!"
+                        feedback(razao,"FeedbackDados")
+                        return false
+                    }
+                    if (ordem[0].status !="pendente"){
+                        const razao = "Ordem já concluída!!"
+                        feedback(razao,"FeedbackDados")
+                        return false
+                    }
+                    
+                }else{
+                    const razao = "Ordem não encontrada!"
+                    feedback(razao,"FeedbackDados")
+                    return false
+                }
+                if (dados.data_conclusao < ordem[0].data_agendamento){
+                    const razao = "A data de conclusão não pode ser anterior à data de agendamento"
+                    feedback(razao,"FeedbackDados")
+                    return false
+                }
+            }
+            return true
+        }
+    </script>
+
+
+
+
+
+
+
+    
+    <script>
+        /* Mostra/esconde as opções de busca*/
+        function menuBotao(botao){
+            const menuSelecionado = document.getElementById(botao)
+             if (menuSelecionado.style.display=="block"){
+                    menuSelecionado.style.display="none"
+
+                }else{
+                    menuSelecionado.style.display="block"
+
+                }
+            }
+        
+
+
+        /* Ativar/desativar uma checkbox faz com que o campo apareça/desapareça*/
+        document.getElementById("menu").querySelectorAll(".item").forEach(menu =>{
+        
+            menu.addEventListener("change", valor =>{
+                const procura = menu.querySelector("div")
+                const codigo = "Id" + procura.id
+                const formulario = document.getElementById(codigo)
+                const campo = formulario.querySelector(`input[name=${valor.target.name}]`)
+
+                if (valor.target.checked == true){
+                    campo.style.display="block"
+                }else{
+                    campo.value=""
+                    campo.dispatchEvent(new Event("change", { bubbles: true }));
+                    campo.style.display="none"
+
+                }
+
+            })
+
+        })
+        
+
+        /* verifica de qual forms veio o dado e faz a busca no requerido */
+        document.getElementById("formularios").querySelectorAll("form").forEach(formulario =>{
+            formulario.addEventListener("input",letra=>{
+                buscaDados(formulario)
+            })})
+        
+        document.getElementById("formularios").querySelectorAll("form").forEach(formulario =>{
+        formulario.addEventListener("change",letra=>{
+            console.log(letra)
+            buscaDados(formulario)
+        })})
+        
+        /* As buscas são feitas por esse script e os dados são enviados ao retorno para imprimir na tela*/
+        async function buscaDados(formulario){
+            const filtro = new FormData(formulario)
+            const dados = Object.fromEntries(filtro)
+            
+            switch(formulario.id){
+                case "IdCliente":
+                    var link = "BuscaCliente"
+                    var tabela = "Clientes"
+                    break
+                case "IdServico":
+                    var link = "BuscaServico"
+                    var tabela = "Servicos"
+                    break
+                case "IdOrdem":
+                    var link = "BuscaOrdem"
+                    var tabela = "Ordens"
+                    break
+            }
+            if (dados.Id != "" || Object.values(dados).some(valor => valor.length >= 1)){
+            fetch("http://localhost:3000/" + link,{
+                method:'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)}
+            ).then(async response =>{
+                const linhas = await response.json()
+                if (typeof linhas == "object" && linhas.length != 0){
+                    retorno(linhas, tabela)
+                }else{
+                    const tabelas = document.getElementById(tabela)
+                    tabelas.innerHTML = (linhas)
+                }
+            })
+
+            }else{
+                const limpa = document.getElementById(tabela)
+                limpa.innerHTML =""
+            }
+        }       
+
+        /* Adiciona à página os dados buscados atribuindo à tabela correta */
+        function retorno(dados, tabela){
+            var listaDados = [8]
+            let contagem = 0
+            Object.keys(dados[0]).forEach(valor =>{
+                listaDados[contagem] = valor
+                contagem++
+            })
+            const lista = document.createElement("div")
+            lista.style.backgroundColor = "black"
+            dados.forEach(cliente =>{
+                const linha = document.createElement("p")
+                linha.style.color="green"
+                var texto = ''
+                listaDados.forEach( valor=>{
+                    texto+= cliente[valor] + " - "
+                })
+                linha.textContent = texto
+                lista.append(linha)
+
+            })
+            const tabelas = document.getElementById(tabela)
+            tabelas.innerHTML = (lista.outerHTML)
+
+        }
+
+    /*Transcreve os feedbacks para o usuário*/
+    function feedback(razao, Idfeedback){
+        const lugar = document.getElementById(Idfeedback)
+        lugar.innerHTML = razao
+    }
+    /*Resta os formulários*/
+    function limpaForms(forms){
+        const form = document.querySelector(forms)
+        form.reset()
+    }
+    </script>
+
+    <script>
+        verificaOrdem()
+    </script>
+</body>
+</html>
