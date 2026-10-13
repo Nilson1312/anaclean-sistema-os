@@ -8,6 +8,11 @@
 </head>
 <body>
     <nav id="menu">
+        <a href="index.html">
+            <button>
+                Index
+            </button>
+        </a>
         <div class="item">
             <button onclick="menuBotao('Cliente')">Pesquisa Cliente</button>
             <div id="Cliente">
@@ -89,6 +94,8 @@
         <button onclick="Ordem('IdOrdemCriar')">Criar Ordem</button>
         <button onclick="Ordem('IdOrdemFinalizar')">Finalizar Ordem</button>
         <button onclick="servicoAdicionar()" id="servicoBotao">Adicionar Serviço</button>
+        <button onclick="servicoRemover()">Remover Serviço</button>
+        <button onclick="GerarPdf()">Gerar Pdf</button>
     </nav>    
     
     <div id="formularios">
@@ -128,7 +135,7 @@
             <div id="Clientes"></div>
             <div id="Servicos"></div>
             <div id="Ordens"></div>
-            <div id="Itens"></div>
+            
         </div>
         
     </div>
@@ -141,7 +148,9 @@
             <input type="date" placeholder="Data de Agendamento" name="data_agendamento">
             <input type="text" placeholder="Valor Total" name="valor_total">
             <input type="text" placeholder="Forma de Pagamento" name="forma_pagamento">
-            <input type="text" placeholder="Observações" name="observacoes">
+            <textarea class="observacao" placeholder="Observações" name="observacoes"></textarea>
+
+
             <input type="submit" value="Criar">
         </form>
 
@@ -151,9 +160,7 @@
             <input type="submit" value="Finalizar">
         </form>
 
-        <div id="FeedbackDados">
-
-        </div>
+        <div id="FeedbackDados"></div>
         
     </div>
 
@@ -165,10 +172,25 @@
             <input type="text" placeholder="Preço unitário" name="preco_unitario">
             <input type="submit" value="Adicionar">
         </form>
+        <form id="IdServicoRemover">
+            <input type="text" placeholder="Id da Ordem" name="ordem_servico_id">
+            <input type="text" placeholder="Id do Serviço", name="servico_id">
+            <input type="submit" value="Remover">
+        </form>
         <div id="FeedbackItens"></div>
+        <div id="Itens"></div>
     </div>
     
-     
+    <div id="GerarPdf">
+        <form id="IdOrdemPdf">
+            <input type="number" placeholder="Id da Ordem" name="Id">
+            <input type="submit" value="Enviar">
+        </form>
+        <div id="FeedbackPdf">
+
+        </div>
+
+    </div> 
     
     
     
@@ -193,7 +215,7 @@
             if (getComputedStyle(servicoForms).display == "none"){
                 servicoForms.style.display= "block"
                 servicoDiv.style.display = "block"
-                const resposta = await fetch("http://localhost:3000/buscaItem", {method:"GET"})
+                const resposta = await fetch("http://localhost:3000/VerificaItem", {method:"GET"})
                 const resultado = await resposta.json()
                 retorno(resultado, "Itens")
             }else{
@@ -233,7 +255,7 @@
 
         /* Verifica se alguma ordem não possui itens*/
         async function verificaOrdem(){
-            const resposta = await fetch("http://localhost:3000/buscaItem", {method:"GET"})
+            const resposta = await fetch("http://localhost:3000/VerificaItem", {method:"GET"})
             const resultado = await resposta.json()
             if (Object.keys(resultado).length != 0){
                 const servicoBotao = document.getElementById("servicoBotao")
@@ -241,6 +263,41 @@
             }
         }
 
+
+
+        const servicoForm = document.getElementById("IdServicoRemover")
+        function servicoRemover(){
+            if (getComputedStyle(servicoForm).display == "none"){
+                servicoForm.style.display = "block"
+            }else{
+                servicoForm.style.display = "none"
+                limpaForms("#IdServicoRemover")            
+            }
+        }
+
+        servicoForm.addEventListener("submit", async evento =>{
+            evento.preventDefault()
+            const  formdata = new FormData(evento.target)
+            const dados = Object.fromEntries(formdata)
+            const envio = await fetch("http://localhost:3000/BuscaItem", {method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)})
+            const busca = await envio.json()
+            console.log(busca)
+            if (busca.length != 0){
+                const envioDelete = await fetch("http://localhost:3000/deletaItem", {method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dados)})
+                const resposta = await envioDelete.json()
+                console.log(resposta)
+                const razao = "Serviço Removido"
+                feedback(razao, "FeedbackItens")
+            }
+        })
     </script>
 
     
@@ -281,6 +338,7 @@
 
         /*Validação de dados dos formularios, cada um tem suas próprias especificações que são filtradas a partir da quantidade de campos*/
         async function ValidaDados(dados){
+            console.log(dados)
             if (Object.keys(dados).length == 5){
                 if (dados.cliente_id == ""){
                     const razao = "Id do Cliente não pode ser nulo!"
@@ -322,7 +380,7 @@
                 }
 
             }else if(Object.keys(dados).length == 2){
-                const id = {Id:dados.Id}
+                const id = {form:{Id:dados.Id}, chave:false}
                 const response = await fetch("http://localhost:3000/BuscaOrdem",{
                     method:'POST',
                     headers: {
@@ -331,12 +389,12 @@
                     body: JSON.stringify(id)})
                 const ordem = await response.json()
                 if (ordem.length >= 1){
-                    if (ordem[0].id != id.Id){
+                    if (ordem[0].id != id.form.Id){
                         const razao = "Ordem não encontrada!"
                         feedback(razao,"FeedbackDados")
                         return false
                     }
-                    if (ordem[0].status !="pendente"){
+                    if (ordem[0].status !="Pendente"){
                         const razao = "Ordem já concluída!!"
                         feedback(razao,"FeedbackDados")
                         return false
@@ -352,6 +410,40 @@
                     feedback(razao,"FeedbackDados")
                     return false
                 }
+            }else if (Object.keys(dados).length == 1){
+                if (dados.Id == null || dados.Id == ""){
+                    const razao = "Id de Ordem não inserido!"
+                    feedback(razao,"FeedbackPdf")
+                    return false
+                }
+                const id = {form:{Id:dados.Id}, chave:false}
+                const response = await fetch("http://localhost:3000/BuscaOrdem",{
+                    method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(id)})
+                const ordem = await response.json()
+                if (ordem.length == 0){
+                    const razao = "Id de Ordem não encontrado!"
+                    feedback(razao,"FeedbackPdf")
+                    return false
+                }
+                const Idordem = {ordem_servico_id:dados.Id}
+                const resultado = await fetch("http://localhost:3000/buscaItem",{
+                method:'POST',
+                headers: {
+                "Content-Type": "application/json"
+                },
+                body: JSON.stringify(Idordem)})
+                const resposta = await resultado.json()
+                if (resposta.length == 0){
+                    const razao = "A ordem não possuí serviços atríbuidos!"
+                    feedback(razao,"FeedbackPdf")
+                    return false
+
+                }
+                
             }
             return true
         }
@@ -405,20 +497,19 @@
         /* verifica de qual forms veio o dado e faz a busca no requerido */
         document.getElementById("formularios").querySelectorAll("form").forEach(formulario =>{
             formulario.addEventListener("input",letra=>{
+    
                 buscaDados(formulario)
             })})
         
         document.getElementById("formularios").querySelectorAll("form").forEach(formulario =>{
         formulario.addEventListener("change",letra=>{
-            console.log(letra)
             buscaDados(formulario)
         })})
         
         /* As buscas são feitas por esse script e os dados são enviados ao retorno para imprimir na tela*/
         async function buscaDados(formulario){
             const filtro = new FormData(formulario)
-            const dados = Object.fromEntries(filtro)
-            
+            var dados = Object.fromEntries(filtro)
             switch(formulario.id){
                 case "IdCliente":
                     var link = "BuscaCliente"
@@ -431,9 +522,12 @@
                 case "IdOrdem":
                     var link = "BuscaOrdem"
                     var tabela = "Ordens"
+                    dados = {form:dados, chave:false}
                     break
             }
-            if (dados.Id != "" || Object.values(dados).some(valor => valor.length >= 1)){
+            const verifica = dados.form ?? dados
+
+            if ((verifica.Id != "" || Object.values(verifica).some(valor => valor.length >= 1))){
             fetch("http://localhost:3000/" + link,{
                 method:'POST',
                 headers: {
@@ -442,7 +536,9 @@
                 body: JSON.stringify(dados)}
             ).then(async response =>{
                 const linhas = await response.json()
-                if (typeof linhas == "object" && linhas.length != 0){
+                if (linhas.Status == 202){
+                    retornoOrdem(linhas,tabela)
+                }else if (typeof linhas == "object" && linhas.length != 0){
                     retorno(linhas, tabela)
                 }else{
                     const tabelas = document.getElementById(tabela)
@@ -458,7 +554,7 @@
 
         /* Adiciona à página os dados buscados atribuindo à tabela correta */
         function retorno(dados, tabela){
-            var listaDados = [8]
+            var listaDados = [9]
             let contagem = 0
             Object.keys(dados[0]).forEach(valor =>{
                 listaDados[contagem] = valor
@@ -466,6 +562,18 @@
             })
             const lista = document.createElement("div")
             lista.style.backgroundColor = "black"
+            lista.style.paddingLeft = "4px"
+            lista.style.paddingRight = "4px"
+            const cabecalho = document.createElement("H3")
+            cabecalho.style.color = "darkgreen"
+            var colunas = ""
+
+            listaDados.forEach( valor=>{
+                    colunas+= valor + " - "
+                })
+            cabecalho.textContent=colunas
+            lista.append(cabecalho)
+
             dados.forEach(cliente =>{
                 const linha = document.createElement("p")
                 linha.style.color="green"
@@ -479,8 +587,81 @@
             })
             const tabelas = document.getElementById(tabela)
             tabelas.innerHTML = (lista.outerHTML)
-
         }
+
+    function retornoOrdem(dados, tabela){
+        const ordem = dados.dados[0]
+        const itens = dados.dados[1]
+        var listaDadosOrdem = [9]
+        let contagem = 0
+        Object.keys(ordem[0]).forEach(valor =>{
+            listaDadosOrdem[contagem] = valor
+            contagem++
+        })
+        var listaDadosItens = [5]
+        contagem = 0
+        Object.keys(itens[0]).forEach(valor =>{
+            listaDadosItens[contagem] = valor
+            contagem++
+        })
+        const lista = document.createElement("div")
+        lista.style.backgroundColor = "black"
+        lista.style.padding = "4px"
+
+        const cabecalho = document.createElement("H3")
+        cabecalho.style.color = "darkgreen"
+        var colunas = ""
+
+        listaDadosOrdem.forEach( valor=>{
+                colunas+= valor + " - "
+            })
+        cabecalho.textContent=colunas
+        lista.append(cabecalho)
+
+        ordem.forEach(cliente =>{
+            const paragrafo = document.createElement("div")
+            const linhaOrdem = document.createElement("p")
+            linhaOrdem.style.color="green"
+            var texto = ''
+            listaDadosOrdem.forEach( valor=>{
+                texto+= cliente[valor] + " - "
+            })
+            linhaOrdem.textContent = texto
+            paragrafo.append(linhaOrdem)
+            itens.forEach(item =>{
+                if (item.ordem_servico_id == cliente.id){
+                    console.log(paragrafo.querySelectorAll("H3")[1])
+                    if (paragrafo.querySelectorAll("H3")[0] == null){
+                        const cabecalhoItem = document.createElement("H3")
+                        cabecalhoItem.style.color = "darkblue"
+                        var colunasItem = ""
+                        listaDadosItens.forEach( valor=>{
+                                colunasItem+= valor + "     -    "
+                            })
+                        cabecalhoItem.textContent=colunasItem
+                        paragrafo.append(cabecalhoItem)
+                    }
+                    
+                    const linhaItem = document.createElement("p")
+                    linhaItem.style.color="blue"
+                    linhaItem.style.letterSpacing ="15px"
+                    texto = ''
+                    listaDadosItens.forEach( valor=>{
+                        texto+= item[valor] + " - "
+                    })
+                    linhaItem.textContent = texto
+                    paragrafo.append(linhaItem)
+
+                }
+            })
+            lista.append(paragrafo)
+
+        })
+        const tabelas = document.getElementById(tabela)
+        tabelas.innerHTML = (lista.outerHTML)
+
+    }
+
 
     /*Transcreve os feedbacks para o usuário*/
     function feedback(razao, Idfeedback){
@@ -492,6 +673,31 @@
         const form = document.querySelector(forms)
         form.reset()
     }
+    </script>
+
+
+
+    <script>
+        const formPdf = document.getElementById("IdOrdemPdf")
+        function GerarPdf(){
+            if (getComputedStyle(formPdf).display != "block"){
+                formPdf.style.display = "block"
+            }else{
+                formPdf.style.display = "none"
+                formPdf.reset()
+            }
+        }
+
+        formPdf.addEventListener("submit", async evento=>{
+            evento.preventDefault()
+            const filtro = new FormData(formPdf)
+            const dados = Object.fromEntries(filtro)
+            if (await ValidaDados(dados) == true){
+                const valor = dados.Id
+                window.open("/pdfDesign.html?id="+ valor,"_blank")
+            }
+        })
+        
     </script>
 
     <script>

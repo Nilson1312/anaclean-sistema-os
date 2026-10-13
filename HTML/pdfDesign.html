@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Modelo PDF</title>
+    <style>
+body{
+    margin: 0px;
+    font-size: 90%;
+    overflow: hidden;
+    
+}
+
+#pdf{
+    margin: 0px;
+    width: 210mm;
+    max-width: 210mm;
+    min-height: 240mm;
+    padding: 10mm 15mm 0mm 15mm;
+    box-sizing: border-box;
+}
+
+.dados{
+    margin: 0px;
+
+}
+
+
+.ladoAlado{
+    display: flex;
+    width: 100%;
+    gap: 55px;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
+
+.dados h3{
+    background-color: lightgray;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-left: auto ;
+    padding: 4px;
+    vertical-align: middle;
+    
+}
+
+h3 img{
+    width: 25px !important;
+    height: 25px !important;
+}
+
+.DadosEmpresa{
+    font-size: small;
+    margin-top: 0px;
+    line-height: 1.5;
+}
+
+.icones{
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    vertical-align: middle;
+    
+}
+
+.DadosContato{
+    line-height: 1.5;
+    margin-top: 0px;
+    vertical-align: middle;
+    padding: 8px; 
+}
+
+
+
+
+.Fundo_Cinza{
+    display: flex;
+    margin-top: 0px;
+    padding: 6px;
+    background-color: lightgray;
+    gap: 2px;
+}
+
+.Fundo_Cinza img{
+    background: black;
+    border-radius: 8px;
+}
+a{
+    text-decoration: none;
+    color: black;
+    margin-right: 30px;
+
+}
+
+
+
+
+
+
+#Fundo_Cinza_Escuro{
+    background-color: gray;
+}
+
+#servicos h2{
+    background-color: lightgray;
+
+}
+
+table{
+    font-size: small;
+    width: 100%;
+}
+
+.total{
+    position: relative;
+    background-color: gray;
+    border-left: 5px;
+
+}
+
+
+
+
+#assinatura{
+    text-align: center;
+}
+
+
+
+#linha{
+    height: 2px;
+    margin: 0 auto;
+    width: 300px;
+    background-color: black;
+}
+
+
+#preenchimento{
+    flex: 0 0 auto;
+    height: 200px;
+    
+}
+
+#dadosbaixo{
+    margin-bottom: 0px;
+    border-top: 1px solid;
+    border-color: black;
+    opacity: 0.6;
+
+}
+    </style>
+</head>
+
+<body>
+<div id="pdf">
+        <div class="dados">
+            <div class="ladoAlado">
+                <h2>AnaClean</h2>
+                <h3>
+                    <img src="icones/date_range_24dp_FFFFFF.png" class="icones">
+                </h3>
+            </div>
+            <div class="ladoAlado">
+                <p class="DadosEmpresa">
+                ANA PAULA DA SILVA SANTANA OLIVEIRA
+                <br>36579200804 <br>
+                CNPJ: 38.243.396/0001-70<br>
+                Rua Princesa Isabel, 346<br>
+                Jardim Belval, Barueri-SP<br>
+                CEP 06420-450
+            </p>
+            <p class="DadosContato">
+                
+                <img src="icones/mail.svg" class="icones">
+                anacleanoficial@gmail.com <br>
+                <img src="icones/phone_24dp_000000.png" class="icones">
+                +55 (11) 98956-3181 <br>
+                <img src="icones/phone_24dp_000000.png" class="icones">   
+                +55 (11) 96131-4322
+        
+            </p>
+            </div>
+            
+            <p class="Fundo_Cinza">
+                
+                <img src="icones/Instagram_Glyph_Black.jpg" class="icones">
+                <a href="">@anaclean_oficial</a>
+                <img src="icones/Facebook_Logo_Secondary.png" class="icones">
+                <a href="">@anaclean_oficial</a>
+            </p>
+        </div>
+
+        <div id="servicos">
+            <h2 id="Fundo_Cinza_Escuro">Orçamento 045-2025</h2>
+            <p>Cliente: Rodrigo</p>
+            <h2>Serviços</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Unidade</th>
+                        <th>Preço unitário</th>
+                        <th>Qtd.</th>
+                        <th>Preço</th>
+                    </tr>
+            
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td colspan="3" class="total">Total</td>
+                        <td class="total">R$190,00</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div id="assinatura">
+                <h3>Barueri, </h3>
+                <br>
+                <p id="linha"></p>
+                <h3>    Ana Clean</h3>
+                <p>Ana Paula Oliveira</p>
+
+            </div>
+
+        </div>
+
+        <div id="preenchimento"></div>
+
+        <div class="dados" id="dadosbaixo">
+            <div class="ladoAlado">
+                <h2>AnaClean</h2>
+            </div>
+            <div class="ladoAlado">
+                <p class="DadosEmpresa">
+                ANA PAULA DA SILVA SANTANA OLIVEIRA
+                <br>36579200804 <br>
+                CNPJ: 38.243.396/0001-70<br>
+                Rua Princesa Isabel, 346<br>
+                Jardim Belval, Barueri-SP<br>
+                CEP 06420-450
+            </p>
+            <p class="DadosContato">
+                
+                <img src="icones/mail.svg" class="icones">
+                anacleanoficial@gmail.com <br>
+                <img src="icones/phone_24dp_000000.png" class="icones">
+                +55 (11) 98956-3181 <br>
+                <img src="icones/phone_24dp_000000.png" class="icones">   
+                +55 (11) 96131-4322
+        
+            </p>
+            </div>
+            
+            <!-- Colocar links das redes-->
+            <p class="Fundo_Cinza">
+                <img src="icones/Instagram_Glyph_Black.jpg" class="icones">
+                <a href="">@anaclean_oficial</a>
+                <img src="icones/Facebook_Logo_Secondary.png" class="icones">
+                <a href="">@anaclean_oficial</a>
+            </p>
+        </div>
+
+        
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+
+
+
+    <script>
+        async function textoPdf(dados){
+            const dado = {form:{Id:dados}, chave:true}
+            const resultado1 = await fetch("http://localhost:3000/BuscaOrdem",{
+            method:'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dado)})
+            const Ordem = await resultado1.json()
+
+            const cliente = {Id:Ordem[0].cliente_id}
+            const resultado2 = await fetch("http://localhost:3000/BuscaCliente",{
+            method:'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(cliente)})
+            const clienteDado = await resultado2.json()
+
+            const ordem = {ordem_servico_id:dados}
+            const resultado3 = await fetch("http://localhost:3000/buscaItem",{
+            method:'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(ordem)})
+            const resposta3 = await resultado3.json()
+
+            const lista =[5]
+            let contagem = 0
+            resposta3.forEach(valor=>{
+                lista[contagem] = valor
+                contagem++
+            })
+
+            contagem = 0
+            const listaServicos = await Promise.all(lista.map(async valor=>{
+                const dado = {id:valor.servico_id}
+                const resultado = await fetch("http://localhost:3000/buscaServico",{
+                        method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dado)})
+                const resposta = await resultado.json()
+                return resposta[0]
+            }))
+            /*
+                Ordem - data de agendamento
+                cliente - primeiro nome
+                lista item - valor e quantidade
+                lista servicos - apenas a descrição e titulo
+            */
+
+            /*Parte da Data*/
+            const dataTag = document.querySelectorAll("h3")
+            const data = Ordem[0].data_agendamento
+            const dataFormatada = data.slice(-2) + "/" + data.slice(5,7) + "/" + data.slice(0,4)
+            dataTag[0].append(dataFormatada)
+            dataTag[1].append(dataFormatada)
+
+            /*Parte do Nome*/
+            const lugarNome = document.getElementById("servicos")
+            const nomeTag = lugarNome.querySelector("p")
+            const nome = clienteDado[0].nome
+            nomeTag.innerHTML = "Cliente: " + nome
+
+            /*parte do numero da ordem*/
+            const ordemTag = document.getElementById("Fundo_Cinza_Escuro")
+            ordemTag.innerHTML = "Orçamento: " + Ordem[0].id + "-" + data.slice(0,4)
+            /*Parte dos servicos*/
+            /*Serviços feitosss*/
+           listaServicos.forEach(servico =>{
+                const ordemDados = [servico.titulo, servico.descricao, "un.", new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(lista[contagem].preco_unitario) ,lista[contagem].quantidade, new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(lista[contagem].quantidade * lista[contagem].preco_unitario)]
+                contagem++
+                const linha = document.createElement("tr")
+                ordemDados.forEach((valor,index) =>{
+                    if (index <2){
+                        if (index ==0){
+                            const dado = document.createElement("td")
+                            dado.append(valor)
+                            dado.append(document.createElement("br"))
+                            dado.append(ordemDados[1])
+                            linha.append(dado)
+                        }
+                    }
+                    else{
+                        const dado = document.createElement("td")
+                        dado.textContent = valor
+                        linha.append(dado)
+
+                    }
+                    
+                })
+                document.querySelector("tbody").append(linha)
+           }) 
+           
+           
+           /*Total feito*/
+            let total = 0           
+            lista.forEach(item =>{
+                total += item.quantidade * item.preco_unitario
+            })
+            document.querySelectorAll(".total")[1].innerHTML = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(total)
+            const base = getComputedStyle(document.getElementById("pdf")).height.slice(0,-2)
+            if (base<1107){
+               
+            }
+            var tamanho = 1107-base
+            if (tamanho< -200){
+                const tag = document.getElementById("dadosbaixo")
+                tag.style.height = "215px"
+                tag.style.lineHeight = "1"
+                tag.style.transformOrigin = "bottom"
+                tamanho = -200
+            }
+        
+            gerarPdf(tamanho)
+
+            /*
+            
+                base + x = 1107
+            pagina limite = 1107
+              trabalhar com 1100 || 1090
+            */
+        }
+        
+
+
+
+
+
+        /*Parte do pdf*/
+        async function gerarPdf(tamanho=0){
+            const conteudo = document.getElementById("pdf")
+            const vazio = document.getElementById("preenchimento")
+            const tamanhofinal = Number(getComputedStyle(vazio).height.slice(0,-2)) + tamanho
+            vazio.style.height = (tamanhofinal) +"px"
+
+            console.table(
+                [...conteudo.children].map(el => {
+                    const estilo = getComputedStyle(el);
+                    const rect = el.getBoundingClientRect();
+
+                    return {
+                    elemento: el.id || el.tagName,
+                    altura: rect.height,
+                    marginTop: estilo.marginTop,
+                    marginBottom: estilo.marginBottom,
+                    paddingTop: estilo.paddingTop,
+                    paddingBottom: estilo.paddingBottom,
+                    flexShrink: estilo.flexShrink
+                    };
+                })
+                );
+
+            const configuracao = {
+                margin:0,
+                filename:"teste.pdf",
+                image:{type:"jpeg", quality:0.95},
+                html2canvas:{scale:3,useCORS:true, allowTaint:false},
+                jsPDF:{unit:"mm", format:"a4", orientation:"portrait"}
+            }
+            html2pdf().set(configuracao).from(conteudo).toPdf().get("pdf").then(pdf=>{
+                const totalpagina = pdf.internal.getNumberOfPages()
+
+                if (totalpagina === 2) {
+                    console.log("Menor que", getComputedStyle(document.getElementById("pdf")).height)
+                }else if(totalpagina == 1){
+                    console.log("Maior que", getComputedStyle(document.getElementById("pdf")).height)
+                }
+            })
+            await html2pdf()
+                .set(configuracao)
+                .from(conteudo)
+                .outputPdf('blob')
+                .then((pdfBlob) => {
+                    const url = URL.createObjectURL(pdfBlob);
+                    window.location.href = url
+                })
+
+            }
+
+            const valor = new URLSearchParams(window.location.search)
+            const id = valor.get("id")
+            if (id != "" && id  != null){
+                textoPdf(id)
+            }
+            
+    </script>
+
+</body>
+</html>

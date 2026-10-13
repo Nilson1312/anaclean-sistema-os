@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+form {
+    display: none;
+}
+
+form input{
+    vertical-align: top;
+}
+
+.descricao{
+    field-sizing: content;
+    min-height: 16px;
+    max-height: 250px;
+    min-width: 162px;
+    max-width: 200px;
+    resize: none;
+    vertical-align: middle;
+}

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços</title>
+    <link rel="stylesheet" href="../CSS/Servicostyle.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">
+            <button>
+                Index
+            </button>
+        </a>
+        <button onclick="funcao('Criar')">Criar</button>
+        <button onclick="funcao('Atualizar')">Atualizar</button>
+        <button onclick="funcao('Deletar')">Deletar</button>
+        <button id="Buscar" onclick="funcao('Buscar')">Buscar</button>
+    </nav>
+    <div>
+        <form id="Criar">
+            <p>Criar Serviço</p>
+            <input placeholder="Título" name="titulo" type="text">
+            <textarea class="descricao" placeholder="Descrição" name="descricao"></textarea>
+            <input placeholder="Valor base" name="valor_base" type="text">
+            <input type="submit" value="Enviar">
+        </form>
+        <form id="Atualizar">
+            <p>Atualizar Serviço</p>
+            <input placeholder="Id" name="Id" type="text">
+            <input placeholder="Título" name="titulo" type="text">
+         
+            <textarea class="descricao" placeholder="Descrição" name="descricao"></textarea>
+            <input placeholder="Valor base" name="valor_base" type="text">
+            <input type="submit" value="Enviar">
+        </form>
+        <form id="Deletar">
+            <p>Deletar Serviço</p>
+            <input placeholder="Id" name="Id" type="text">
+            <input type="submit" value="Enviar">
+        </form>
+    </div>
+    <div>
+        <div id="FeedbackEnvio"></div>
+        <div id="FeedbackBusca"></div>
+    </div>
+
+    <div id="Servicos">
+
+    </div>
+    
+
+    
+    <script>
+    /*Tudo relacionado a aparencia do site, esconder mostrar*/
+    function funcao(escolha){
+        const forms = document.getElementById(escolha)
+        if (forms.tagName == "FORM"){
+            if (getComputedStyle(forms).display == "none"){
+                forms.style.display = "block"
+            }else{
+                forms.style.display = "none"
+                forms.reset()
+                forms.dispatchEvent(new Event("change", { bubbles: true }))
+            }
+        }else{
+            if (forms.style.backgroundColor != "green"){
+                forms.style.backgroundColor = "green"
+            }else{
+                forms.style.backgroundColor = "white"
+                document.getElementById("FeedbackBusca").innerText=""
+            }
+        }
+    }
+
+    </script>
+
+    <script>
+    /*Feedback*/
+
+    async function buscaServicos(forms){
+        const filtro = new FormData(forms)
+        const dados = Object.fromEntries(filtro)
+        if (Object.values(dados).some(valor => valor.length >= 1)){
+            const resultado = await fetch("http://localhost:3000/BuscaServico",{
+            method:'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)})
+            const resposta = await resultado.json()
+            return resposta
+        }
+        document.getElementById("FeedbackBusca").innerHTML=""
+        return false
+        
+
+    }
+
+    function retorno(dados, tabela){
+            var listaDados = [4]
+            let contagem = 0
+            Object.keys(dados[0]).forEach(valor =>{
+                listaDados[contagem] = valor
+                contagem++
+            })
+            const lista = document.createElement("div")
+            lista.style.backgroundColor = "black"
+            dados.forEach(cliente =>{
+                const linha = document.createElement("p")
+                linha.style.color="green"
+                var texto = ''
+                listaDados.forEach( valor=>{
+                    texto+= cliente[valor] + " - "
+                })
+                linha.textContent = texto
+                lista.append(linha)
+
+            })
+            const tabelas = document.getElementById(tabela)
+            tabelas.innerHTML = (lista.outerHTML)
+
+        }
+
+
+    function feedback(razao, lugar){
+        const espaco = document.getElementById(lugar)
+        espaco.innerHTML = razao
+    }
+    </script>
+
+    <script>
+    /*Envio dos dados ao backend*/ 
+    const busca = document.getElementById("Buscar")
+    const formularios = document.querySelectorAll("form")
+    formularios.forEach(forms =>{
+        forms.addEventListener("keypress", evento=>{
+            if (evento.key == "Enter"){
+                evento.preventDefault()
+            }
+        })
+    })
+   
+    formularios.forEach(forms =>{
+        forms.addEventListener("input", async evento=>{
+            if (busca.style.backgroundColor == "green"){
+                const dado = await buscaServicos(forms)
+                if(dado != false){
+                    retorno(dado,"FeedbackBusca")
+                }
+                
+            }
+        })
+    })
+
+     formularios.forEach(forms =>{
+        forms.addEventListener("change", async evento=>{
+            if (busca.style.backgroundColor == "green"){
+                const dado = await buscaServicos(forms)
+                if(dado != false){
+                    retorno(dado,"FeedbackBusca")
+                }
+            }
+        })
+    })
+
+     formularios.forEach(forms =>{
+        forms.addEventListener("submit", evento=>{
+            evento.preventDefault()
+            if(validaDados(forms) == true){
+                bancoServicos(forms)
+            }
+        })
+    })
+
+
+
+
+
+    async function bancoServicos(forms){
+        switch(forms.id){
+            case "Criar":
+                var link = "servicos"
+                break
+            case "Atualizar":
+                var link = "servicos"
+                break
+            case "Deletar":
+                var link = "DeletaServico"
+                break
+        }
+
+        const filtro = new FormData(forms)
+        const dados = Object.fromEntries(filtro)
+        const resultado = await fetch("http://localhost:3000/" + link,{
+            method:'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)}
+            )   
+        const resposta = await resultado.json()
+        if (resposta.Status == 200){
+            forms.reset()
+            carregaServicos()
+            feedback(resposta.Mensagem, "FeedbackEnvio")
+        }else if(resposta.Status == 402 ){
+            feedback(resposta.Mensagem, "FeedbackEnvio")
+        }
+        
+
+
+        
+        
+    }
+    
+    function validaDados(forms){
+        const filtro = new FormData(forms)
+        const dados = Object.fromEntries(filtro)
+        const tamanho = Object.keys(dados)
+        if(tamanho.length == 4){
+    
+            if (dados.Id == ""){
+                const razao = "O Id não pode ser nulo!"
+                feedback(razao, "FeedbackEnvio")
+                return false
+            }
+        }else if(tamanho.length == 3){
+            if (dados.titulo == ""){
+                const razao = "O Título não pode ser nulo!"
+                feedback(razao, "FeedbackEnvio") 
+                return false
+            }
+        }else if(tamanho.length == 1){
+
+            const lista = document.getElementById("Servicos").querySelector("div").querySelectorAll("p")
+            const listatexto = []
+            var validade = ""
+            let contagem = 0
+            lista.forEach(valor =>{
+                listatexto[contagem] = valor.innerText
+                contagem++
+            })
+            validade = listatexto.some(valor => {
+                if (valor.slice(0,valor.indexOf("-")-1) == dados.Id)
+                {
+                    return true
+                }
+            })
+            if (validade != true){
+                const razao = "O Id não existe no banco!"
+                feedback(razao, "FeedbackEnvio")
+                return false
+
+            }
+            if (dados.Id == ""){
+                const razao = "O Id não pode ser nulo!"
+                feedback(razao, "FeedbackEnvio")
+                return false
+            }
+        }
+
+        return true
+    }
+    </script>
+
+    <script>
+        async function carregaServicos(){
+            const resultado = await fetch("http://localhost:3000/servicos", {method:"GET"})
+            const dados = await resultado.json()
+            retorno(dados,"Servicos")
+        }
+
+        carregaServicos()
+    </script>
+    
+</body>
+</html>

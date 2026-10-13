@@ -108,6 +108,10 @@
                 }
                 
                 tabela.innerHTML = ""
+                const cabecalho = document.createElement("p")
+                cabecalho.textContent = "Id - Nome - Telefone - E-mail - Endereco - Numero - Bairro - Cidade - Criado Em"
+                tabela
+                tabela.append(cabecalho)
                 clientes.forEach(cliente => {
                     const li = document.createElement("li")
 

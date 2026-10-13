@@ -1,0 +1,89 @@
+@charset "UTF-8";
+
+#menu{
+    display: flex;
+}
+
+.item{
+ position: relative;
+}
+
+.item div{
+    position: absolute;
+    display: none;
+    top: 100%;
+    left: 0%;
+    z-index: 1;
+    background-color: lightgray;
+    width: 110px;
+    border-radius: 3px;
+}
+
+.item label{
+    display: flex;
+
+}
+
+#formularios input{
+    display: none;
+}
+
+#feedback #Clientes{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 250px;
+}
+#feedback #Servicos{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 250px;
+}
+#feedback #Ordens{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 250px;
+}
+
+#feedback div{
+    display:block;
+}
+#feedback H3{
+    color: darkgreen;
+}
+
+
+#IdOrdemCriar{
+    display: none;
+}
+
+#IdOrdemCriar input{
+    vertical-align: top;
+}
+
+#IdOrdemFinalizar{
+    display: none;
+}
+
+.observacao{
+    field-sizing: content;
+    min-height: 16px;
+    max-height: 250px;
+    min-width: 162px;
+    max-width: 200px;
+    resize: none;
+    vertical-align: middle;
+}
+
+#IdServicoAdicionar{
+    display: none;
+}
+#IdServicoRemover{
+    display: none;
+}
+
+
+#IdOrdemPdf{
+    display: none;
+}
+
+
