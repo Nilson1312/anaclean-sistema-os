@@ -19,16 +19,33 @@ async function cadastraOrdem(dados){
 
 
 async function atualizaOrdem(dados){
-    const id = dados.Id
-    const status = "Concluído"
-    const conclusao = dados.data_conclusao
-    const db = await getDatabaseConnection();
-    const resultado = await db.run(
-        `UPDATE ordens_servico
-         SET status = ?,
-             data_conclusao = ?
-         WHERE id = ?`,[status, conclusao, id])
-    return resultado
+    if (Object.keys(dados)[1] == "data_conclusao"){
+        const id = dados.Id 
+        const data_conclusao = Object.values(dados)[1]
+        const status = "Concluído"
+        const db = await getDatabaseConnection()
+        const resultado = await db.run(
+            `UPDATE ordens_servico
+            SET status = ?,
+                data_conclusao = ?
+            WHERE id = ?`,[status, data_conclusao, id])
+        return resultado
+    }else{
+        const id = dados.Id 
+        const data_agendamento = Object.values(dados)[1]
+        const status = "Pendente"
+        const data_conclusao = ""
+        const db = await getDatabaseConnection()
+        const resultado = await db.run(
+            `UPDATE ordens_servico
+            SET status = ?,
+                data_agendamento = ?,
+                data_conclusao = ?
+            WHERE id = ?`,[status, data_agendamento, data_conclusao, id])
+        return resultado
+
+    }
+    
 }
 
 

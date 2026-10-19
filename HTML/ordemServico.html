@@ -92,7 +92,7 @@
         </div>
 
         <button onclick="Ordem('IdOrdemCriar')">Criar Ordem</button>
-        <button onclick="Ordem('IdOrdemFinalizar')">Finalizar Ordem</button>
+        <button onclick="Ordem('IdOrdemFinalizar')">Atualizar Ordem</button>
         <button onclick="servicoAdicionar()" id="servicoBotao">Adicionar Serviço</button>
         <button onclick="servicoRemover()">Remover Serviço</button>
         <button onclick="GerarPdf()">Gerar Pdf</button>
@@ -100,18 +100,14 @@
     
     <div id="formularios">
         <form id="IdCliente";>
-            <p>
-                <input placeholder="Id" name="Id" type="number" >
-                <input placeholder="Nome" name="nome" type="text" >
-                <input placeholder="()_____-____" id="telefone" name="telefone" type="text" minlength="11" maxlength="11">
-
-                <input placeholder="Email" name="email" type="text" >
-            </p>
-                <input placeholder="Endereco" name="endereco" type="text" >
-                <input placeholder="Numero" name="numero" type="text" >
-                <input placeholder="Bairro" name="bairro" type="text" >
-                <input placeholder="Cidade" name="cidade" type="text" >
-            
+            <input placeholder="Id" name="Id" type="number" >
+            <input placeholder="Nome" name="nome" type="text" >
+            <input placeholder="()_____-____" id="telefone" name="telefone" type="text" minlength="11" maxlength="11">
+            <input placeholder="Email" name="email" type="text" >
+            <input placeholder="Endereco" name="endereco" type="text" >
+            <input placeholder="Numero" name="numero" type="text" >
+            <input placeholder="Bairro" name="bairro" type="text" >
+            <input placeholder="Cidade" name="cidade" type="text" >
         </form>
         <form id="IdServico">
             <input placeholder="Id" name="Id" type="number" >
@@ -134,8 +130,7 @@
         <div id="feedback">
             <div id="Clientes"></div>
             <div id="Servicos"></div>
-            <div id="Ordens"></div>
-            
+            <div id="Ordens"></div>            
         </div>
         
     </div>
@@ -156,8 +151,8 @@
 
         <form id="IdOrdemFinalizar">
             <input type="number" placeholder="Id Ordem" name="Id">
-            <input type="date" placeholder="Data de Conclusão" name="data_conclusao">
-            <input type="submit" value="Finalizar">
+            <input type="date" placeholder="Esperando Id" name="d">
+            <input type="submit" value="Buscando">
         </form>
 
         <div id="FeedbackDados"></div>
@@ -242,9 +237,10 @@
                     body: JSON.stringify(dados)})
                     const resposta = await envio.json()
                     if (envio.status == 201){
+                        servicoForms.style.display= "none"
                         const razao = "Itens foram adicionados à ordem"
                         feedback(razao, "FeedbackItens")
-                        verificaOrdem()
+                        servicoAdicionar()
                     }else if(envio.status == 409){
                         const razao = "Dados não podem ser adicionados, conflito de chaves!"
                         feedback(razao, "FeedbackItens")
@@ -285,7 +281,6 @@
                     },
                     body: JSON.stringify(dados)})
             const busca = await envio.json()
-            console.log(busca)
             if (busca.length != 0){
                 const envioDelete = await fetch("http://localhost:3000/deletaItem", {method:'POST',
                     headers: {
@@ -293,7 +288,6 @@
                     },
                     body: JSON.stringify(dados)})
                 const resposta = await envioDelete.json()
-                console.log(resposta)
                 const razao = "Serviço Removido"
                 feedback(razao, "FeedbackItens")
             }
@@ -333,12 +327,38 @@
                 }     
             })
         })
+        const formAtt = document.getElementById("IdOrdemFinalizar")
+        formAtt.addEventListener("input", async evento=>{
+            evento.preventDefault()
+            const  formdata = new FormData(formAtt)
+            const dados_ordem = Object.fromEntries(formdata)
+            if (Object.values(dados_ordem)[0] == "" || Object.values(dados_ordem)[1] != "" && Object.values(dados_ordem)[0] == "" ){
+                formAtt.elements[2].value = "Buscando"
+                return false
+            }
+
+            const id = {form:{Id:dados_ordem.Id}, chave:true}
+                const response = await fetch("http://localhost:3000/BuscaOrdem",{
+                    method:'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(id)})
+                const ordem = await response.json()
+                    if (ordem[0].status =="Pendente"){
+                        formAtt.elements[1].name = "data_conclusao"
+                        formAtt.elements[2].value = "Finalizar"
+                    }
+                    if (ordem[0].status == "Concluído"){
+                        formAtt.elements[1].name = "data_agendamento"
+                        formAtt.elements[2].value = "Abrir"
+                    }
+        })
 
 
 
         /*Validação de dados dos formularios, cada um tem suas próprias especificações que são filtradas a partir da quantidade de campos*/
         async function ValidaDados(dados){
-            console.log(dados)
             if (Object.keys(dados).length == 5){
                 if (dados.cliente_id == ""){
                     const razao = "Id do Cliente não pode ser nulo!"
@@ -380,7 +400,7 @@
                 }
 
             }else if(Object.keys(dados).length == 2){
-                const id = {form:{Id:dados.Id}, chave:false}
+                const id = {form:{Id:dados.Id}, chave:true}
                 const response = await fetch("http://localhost:3000/BuscaOrdem",{
                     method:'POST',
                     headers: {
@@ -394,8 +414,13 @@
                         feedback(razao,"FeedbackDados")
                         return false
                     }
-                    if (ordem[0].status !="Pendente"){
-                        const razao = "Ordem já concluída!!"
+                    if (Object.values(dados)[1] == "" ){
+                        const razao = "Nenhuma data adicionada!"
+                        feedback(razao,"FeedbackDados")
+                        return false
+                    }
+                    if (ordem[0].status == "Pendente" && dados.data_conclusao < ordem[0].data_agendamento){
+                        const razao = "A data de conclusão não pode ser anterior à data de agendamento"
                         feedback(razao,"FeedbackDados")
                         return false
                     }
@@ -405,11 +430,7 @@
                     feedback(razao,"FeedbackDados")
                     return false
                 }
-                if (dados.data_conclusao < ordem[0].data_agendamento){
-                    const razao = "A data de conclusão não pode ser anterior à data de agendamento"
-                    feedback(razao,"FeedbackDados")
-                    return false
-                }
+                
             }else if (Object.keys(dados).length == 1){
                 if (dados.Id == null || dados.Id == ""){
                     const razao = "Id de Ordem não inserido!"
@@ -589,7 +610,7 @@
             tabelas.innerHTML = (lista.outerHTML)
         }
 
-    function retornoOrdem(dados, tabela){
+        function retornoOrdem(dados, tabela){
         const ordem = dados.dados[0]
         const itens = dados.dados[1]
         var listaDadosOrdem = [9]
@@ -630,7 +651,6 @@
             paragrafo.append(linhaOrdem)
             itens.forEach(item =>{
                 if (item.ordem_servico_id == cliente.id){
-                    console.log(paragrafo.querySelectorAll("H3")[1])
                     if (paragrafo.querySelectorAll("H3")[0] == null){
                         const cabecalhoItem = document.createElement("H3")
                         cabecalhoItem.style.color = "darkblue"
@@ -663,13 +683,13 @@
     }
 
 
-    /*Transcreve os feedbacks para o usuário*/
-    function feedback(razao, Idfeedback){
+        /*Transcreve os feedbacks para o usuário*/
+        function feedback(razao, Idfeedback){
         const lugar = document.getElementById(Idfeedback)
         lugar.innerHTML = razao
     }
-    /*Resta os formulários*/
-    function limpaForms(forms){
+        /*Resta os formulários*/
+        function limpaForms(forms){
         const form = document.querySelector(forms)
         form.reset()
     }
